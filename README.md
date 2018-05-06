@@ -1,6 +1,11 @@
 # vue-hotzone
 
-> A Vue.js project
+> A Vue.js project  
+> 热区组件 开发中
+
+- [ ] 目前只加了四个角的handle_anchor, 还要增加边上的四个
+- [ ] 事件回调钩子还未增加
+- [ ] 参照https://github.com/pespantelis/vue-crop 优化我的指令
 
 ## Build Setup
 
