@@ -6,6 +6,7 @@
 - [ ] 目前只加了四个角的handle_anchor, 还要增加边上的四个
 - [ ] 事件回调钩子还未增加
 - [ ] 参照https://github.com/pespantelis/vue-crop 优化我的指令
+- [ ] 按照一定比例缩放用户上传的图片？（先按照我们业务需要来）
 
 ## Build Setup
 
