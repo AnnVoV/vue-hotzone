@@ -40,6 +40,7 @@ var bindEvent = (el) => {
             }
         },
         mouseup () {
+            debugger;
             getIsMove(false)
             getIsDrag(false)
         }

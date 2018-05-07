@@ -1,9 +1,13 @@
-var restrictXInCon = (x, containerPos) => {
-    return (x < 0) ? 0 : (x > containerPos.width) ? containerPos.width : x
+var restrictXInCon = (containerPos) => {
+    return (x) => {
+        return (x < 0) ? 0 : (x > containerPos.width) ? containerPos.width : x
+    }
 }
 
-var restrictYInCon = (y, containerPos) => {
-    return (y < 0) ? 0 : (y > containerPos.height) ? containerPos.height : y
+var restrictYInCon = (containerPos) => {
+    return (y) => {
+        return (y < 0) ? 0 : (y > containerPos.height) ? containerPos.height : y
+    }
 }
 
 export default {
@@ -37,6 +41,22 @@ export default {
                 this.opDragDir = 'ne'
                 break
             }
+            case 'n': {
+                this.opDragDir = 'w'
+                break
+            }
+            case 'w': {
+                this.opDragDir = 'n'
+                break
+            }
+            case 's': {
+                this.opDragDir = 'e'
+                break
+            }
+            case 'e': {
+                this.opDragDir = 's'
+                break
+            }
             case 'move': {
                 this.opDragDir = 'move'
             }
@@ -49,40 +69,76 @@ export default {
         }
     },
     getDragCoord (moveTargetPos, mouseX, mouseY, containerPos) {
+        const restrictX = restrictXInCon(containerPos)
+        const restrictY = restrictYInCon(containerPos)
         switch (this.opDragDir) {
+            case 'n': {
+                return {
+                    x: restrictX(moveTargetPos.initialX),
+                    y: restrictY(moveTargetPos.initialY),
+                    x2: restrictX(mouseX + moveTargetPos.width / 2),
+                    y2: restrictY(mouseY)
+                }
+            }
+            case 'w': {
+                return {
+                    x: restrictX(mouseX - moveTargetPos.width / 2),
+                    y: restrictY(mouseY),
+                    x2: restrictX(moveTargetPos.initialX + moveTargetPos.width),
+                    y2: restrictY(moveTargetPos.initialY + moveTargetPos.height),
+                    isChange: true
+                }
+            }
+            case 's': {
+                return {
+                    x: restrictX(mouseX),
+                    y: restrictY(mouseY - moveTargetPos.height / 2),
+                    x2: restrictX(moveTargetPos.initialX + moveTargetPos.width),
+                    y2: restrictY(moveTargetPos.initialY + moveTargetPos.height),
+                    isChange: true
+                }
+            }
+            case 'e': {
+                return {
+                    x: restrictX(moveTargetPos.initialX),
+                    y: restrictY(moveTargetPos.initialY),
+                    x2: restrictX(mouseX),
+                    y2: restrictY(mouseY + moveTargetPos.height)
+                }
+            }
             case 'nw': {
                 return {
-                    x: restrictXInCon(moveTargetPos.initialX, containerPos),
-                    y: restrictYInCon(moveTargetPos.initialY, containerPos),
-                    x2: restrictXInCon(mouseX, containerPos),
-                    y2: restrictYInCon(mouseY, containerPos),
+                    x: restrictX(moveTargetPos.initialX),
+                    y: restrictY(moveTargetPos.initialY),
+                    x2: restrictX(mouseX),
+                    y2: restrictY(mouseY),
                     isChange: false
                 }
             }
             case 'ne': {
                 return {
-                    x: restrictXInCon(mouseX, containerPos),
-                    y: restrictYInCon(moveTargetPos.initialY, containerPos),
-                    x2: restrictXInCon(moveTargetPos.initialX + moveTargetPos.width, containerPos),
-                    y2: restrictYInCon(mouseY, containerPos),
+                    x: restrictX(mouseX),
+                    y: restrictY(moveTargetPos.initialY),
+                    x2: restrictX(moveTargetPos.initialX + moveTargetPos.width),
+                    y2: restrictY(mouseY),
                     isChange: true
                 }
             }
             case 'sw': {
                 return {
-                    x: restrictXInCon(moveTargetPos.initialX, containerPos),
-                    y: restrictYInCon(mouseY, containerPos),
-                    x2: restrictXInCon(mouseX, containerPos),
-                    y2: restrictYInCon(moveTargetPos.initialY + moveTargetPos.height, containerPos),
+                    x: restrictX(moveTargetPos.initialX),
+                    y: restrictY(mouseY),
+                    x2: restrictX(mouseX),
+                    y2: restrictY(moveTargetPos.initialY + moveTargetPos.height),
                     isChange: true
                 }
             }
             case 'se': {
                 return {
-                    x: restrictXInCon(mouseX, containerPos),
-                    y: restrictYInCon(mouseY, containerPos),
-                    x2: restrictXInCon(moveTargetPos.initialX + moveTargetPos.width, containerPos),
-                    y2: restrictYInCon(moveTargetPos.initialY + moveTargetPos.height, containerPos),
+                    x: restrictX(mouseX),
+                    y: restrictY(mouseY),
+                    x2: restrictX(moveTargetPos.initialX + moveTargetPos.width),
+                    y2: restrictY(moveTargetPos.initialY + moveTargetPos.height),
                     isChange: true
                 }
             }

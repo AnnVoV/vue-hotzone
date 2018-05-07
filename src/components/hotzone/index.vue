@@ -24,9 +24,13 @@ export default {
             anchorNormalKlass: 'hotzone-area-anchor',
             anchorKlassList: [
                 {klass: 'hotzone-area-leftTop', drag: 'nw'},
+                {klass: 'hotzone-area-top', drag: 'n'},
                 {klass: 'hotzone-area-rightTop', drag: 'ne'},
+                {klass: 'hotzone-area-right', drag: 's'},
+                {klass: 'hotzone-area-rightBottom', drag: 'se'},
+                {klass: 'hotzone-area-bottom', drag: 'w'},
                 {klass: 'hotzone-area-leftBottom', drag: 'sw'},
-                {klass: 'hotzone-area-rightBottom', drag: 'se'}
+                {klass: 'hotzone-area-left', drag: 'e'}
             ]
         }
     },
@@ -78,6 +82,30 @@ export default {
     .hotzone-area-leftBottom {
         left: -4px;
         bottom: -4px;
+    }
+
+    .hotzone-area-left {
+        left: -4px;
+        top: 50%;
+        transform: translate(0, -4px);
+    }
+
+    .hotzone-area-right {
+        right: -4px;
+        top: 50%;
+        transform: translate(0, -4px);
+    }
+
+    .hotzone-area-bottom {
+        bottom: -4px;
+        left: 50%;
+        transform: translate(-4px, 0);
+    }
+
+    .hotzone-area-top {
+        top: -4px;
+        left: 50%;
+        transform: translate(-4px, 0);
     }
 
     .hotzone-area-rightTop {
