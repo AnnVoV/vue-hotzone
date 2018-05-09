@@ -23,14 +23,16 @@ var bindEvent = (el) => {
             moveTargetPos.initialY = moveTargetPos.y - containerPos.y
         },
         mousemove (e) {
-            var nowPos = {}
-            var pos = {}
+            var nowPos = {}, pos = {}
             var elStyle = el.children[0].style
-            var mouseX = e.clientX - containerPos.x
-            var mouseY = e.clientY - containerPos.y
+            var mouseX = e.clientX - containerPos.x, mouseY = e.clientY - containerPos.y
             var point = Coord.getDragCoord(moveTargetPos, mouseX, mouseY, containerPos)
+            var oldX = (point && point.x) || 0, oldY = (point && point.y) || 0
             if (getIsDrag()) {
                 nowPos = Coord.calculateByPoint(point)
+                point.x = _.restrictXInCon(point.x, nowPos.width, containerPos, 'width')
+                point.y = _.restrictXInCon(point.y, nowPos.height, containerPos, 'height');
+                (point.x !== oldX || point.y !== oldY) && (nowPos = Coord.calculateByPoint(point))
                 elStyle.width = `${nowPos.width}px`
                 elStyle.height = `${nowPos.height}px`
                 if (point.isChange) elStyle.webkitTransform = elStyle.transform = `translate(${point.x}px, ${point.y}px)`
@@ -40,7 +42,6 @@ var bindEvent = (el) => {
             }
         },
         mouseup () {
-            debugger;
             getIsMove(false)
             getIsDrag(false)
         }

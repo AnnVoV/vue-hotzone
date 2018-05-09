@@ -1,8 +1,8 @@
 <template>
-    <section class="hotzone" :style="{backgroundImage: 'url(' + imgUrl + ')'}" v-touchdir="test">
-        <div class="hotzone-area" :style="{width: anchorWidth + 'px', height: anchorHeight + 'px'}">
+    <section class="hotzone" :style="{backgroundImage: `url( ${imgUrl})`}" v-touchdir="test">
+        <div class="hotzone-area" :style="{width: `${anchorWidth}px`, height: `${anchorHeight}px`}">
             <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
-                 :data-drag="item.drag"
+                 :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
             ></div>
         </div>
     </section>
@@ -26,11 +26,11 @@ export default {
                 {klass: 'hotzone-area-leftTop', drag: 'nw'},
                 {klass: 'hotzone-area-top', drag: 'n'},
                 {klass: 'hotzone-area-rightTop', drag: 'ne'},
-                {klass: 'hotzone-area-right', drag: 's'},
+                {klass: 'hotzone-area-right', drag: 'e'},
                 {klass: 'hotzone-area-rightBottom', drag: 'se'},
-                {klass: 'hotzone-area-bottom', drag: 'w'},
+                {klass: 'hotzone-area-bottom', drag: 's'},
                 {klass: 'hotzone-area-leftBottom', drag: 'sw'},
-                {klass: 'hotzone-area-left', drag: 'e'}
+                {klass: 'hotzone-area-left', drag: 'w'}
             ]
         }
     },

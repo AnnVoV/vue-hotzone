@@ -14,13 +14,16 @@ export default {
         }
     },
     restrictMove (endX, endY, width, height, startPos) {
-        endX = endX - width / 2;
-        endY = endY - height / 2;
+        endX = endX - width / 2
+        endY = endY - height / 2
         const X_MAX = startPos.width - width
         const Y_MAX = startPos.height - height
         return {
             x: (endX < 0) ? 0 : (endX > X_MAX) ? X_MAX : endX,
             y: (endY < 0) ? 0 : (endY > Y_MAX) ? Y_MAX : endY
         }
+    },
+    restrictXInCon (x, sth, containerPos, type) {
+        return (x < 0) ? 0 : (x + sth > containerPos[type]) ? containerPos[type] - sth : x
     }
 }

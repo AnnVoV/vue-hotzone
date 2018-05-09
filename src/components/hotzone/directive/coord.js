@@ -42,19 +42,19 @@ export default {
                 break
             }
             case 'n': {
-                this.opDragDir = 'w'
+                this.opDragDir = 's'
                 break
             }
             case 'w': {
-                this.opDragDir = 'n'
-                break
-            }
-            case 's': {
                 this.opDragDir = 'e'
                 break
             }
+            case 's': {
+                this.opDragDir = 'n'
+                break
+            }
             case 'e': {
-                this.opDragDir = 's'
+                this.opDragDir = 'w'
                 break
             }
             case 'move': {
@@ -73,6 +73,7 @@ export default {
         const restrictY = restrictYInCon(containerPos)
         switch (this.opDragDir) {
             case 'n': {
+                debugger
                 return {
                     x: restrictX(moveTargetPos.initialX),
                     y: restrictY(moveTargetPos.initialY),
@@ -80,7 +81,7 @@ export default {
                     y2: restrictY(mouseY)
                 }
             }
-            case 'w': {
+            case 's': {
                 return {
                     x: restrictX(mouseX - moveTargetPos.width / 2),
                     y: restrictY(mouseY),
@@ -89,7 +90,7 @@ export default {
                     isChange: true
                 }
             }
-            case 's': {
+            case 'e': {
                 return {
                     x: restrictX(mouseX),
                     y: restrictY(mouseY - moveTargetPos.height / 2),
@@ -98,7 +99,7 @@ export default {
                     isChange: true
                 }
             }
-            case 'e': {
+            case 'w': {
                 return {
                     x: restrictX(moveTargetPos.initialX),
                     y: restrictY(moveTargetPos.initialY),
