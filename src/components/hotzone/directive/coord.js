@@ -73,7 +73,6 @@ export default {
         const restrictY = restrictYInCon(containerPos)
         switch (this.opDragDir) {
             case 'n': {
-                debugger
                 return {
                     x: restrictX(moveTargetPos.initialX),
                     y: restrictY(moveTargetPos.initialY),
