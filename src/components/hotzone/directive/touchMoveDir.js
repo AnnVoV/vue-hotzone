@@ -2,7 +2,7 @@ import Coord from './coord.js'
 import _ from './util.js'
 
 var handler = {}
-var bindEvent = (el) => {
+var bindEvent = (el, ctx) => {
     var containerPos = {}
     var moveTargetPos = {}
     var getIsDrag = () => {
@@ -42,8 +42,20 @@ var bindEvent = (el) => {
             }
         },
         mouseup () {
+            var elStyle = el.children[0].style
+            var posArr = []
+            var res = {}
+
             getIsMove(false)
             getIsDrag(false)
+            posArr = elStyle.transform.match(/(\d)+/g)
+            res = {
+                width: `${_.numberArrInString(elStyle.width)[0]}px`,
+                height: `${_.numberArrInString(elStyle.height)[0]}px`,
+                x: `${posArr[0]}px`,
+                y: `${posArr[1]}px`
+            }
+            ctx.$emit('mouseup', res)
         }
     }
 
@@ -60,8 +72,7 @@ var offEvent = (el) => {
 
 export default {
     bind (el, binding, vnode) {
-        // el 是整个热区容器
-        bindEvent(el)
+        bindEvent(el, vnode.context)
     },
     unbind (el) {
         offEvent(el)

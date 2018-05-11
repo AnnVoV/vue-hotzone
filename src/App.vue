@@ -10,7 +10,7 @@ import HotzoneDrag from './components/hotzone/index'
 export default {
     name: 'App',
     components: {
-        'hotzone-drag': HotzoneDrag
+        HotzoneDrag
     }
 }
 </script>

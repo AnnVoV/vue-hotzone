@@ -25,5 +25,9 @@ export default {
     },
     restrictXInCon (x, sth, containerPos, type) {
         return (x < 0) ? 0 : (x + sth > containerPos[type]) ? containerPos[type] - sth : x
+    },
+    numberArrInString (str) {
+        var arr = str.match(/(\d)+/g)
+        return arr
     }
 }

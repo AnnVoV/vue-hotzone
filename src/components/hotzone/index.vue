@@ -1,6 +1,6 @@
 <template>
-    <section class="hotzone" :style="{backgroundImage: `url( ${imgUrl})`}" v-touchdir="test">
-        <div class="hotzone-area" :style="{width: `${anchorWidth}px`, height: `${anchorHeight}px`}">
+    <section class="hotzone" :style="{backgroundImage: `url( ${imgUrl})`}" v-touchdir @mouseup="upTest">
+        <div class="hotzone-area" :style="{width: `${anchorWidth}px`, height: `${anchorHeight}px`, transform: `translate(${initialLeft}px, ${initialTop}px)`}">
             <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
                  :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
             ></div>
@@ -35,11 +35,22 @@ export default {
         }
     },
     props: {
-        imgUrl: String
+        imgUrl: String,
+        initialLeft: {
+            type: Number,
+            default: 100
+        },
+        initialTop: {
+            type: Number,
+            default: 100
+        }
     },
     methods: {
         test () {
             console.log('test');
+        },
+        upTest(e) {
+            console.log(e);
         }
     }
 }
@@ -61,7 +72,6 @@ export default {
 
     .hotzone-area {
         position: absolute;
-        transform: translate(100px, 100px);
         background: rgba(0, 0, 0, .6);
         z-index: 100;
     }
