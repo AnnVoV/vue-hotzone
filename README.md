@@ -10,7 +10,7 @@
 - [x] 支持添加多个热区
 
 ## 示例图
-![](http://github.com/AnnVoV/vue-hotzone/raw/master/demoImg/demo.gif)
+![](https://haitao.nos.netease.com/0b570426-8d52-4380-94ff-26866f99b735.gif)
 
 ## Usage
 ```
