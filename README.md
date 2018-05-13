@@ -9,6 +9,9 @@
 - [ ] 参照https://github.com/pespantelis/vue-crop 优化我的指令
 - [x] 支持添加多个热区
 
+## 示例图
+![](http://github.com/AnnVoV/vue-hotzone/raw/master/demoImg/demo.gif)
+
 ## Usage
 ```
 <hotzone-drag
