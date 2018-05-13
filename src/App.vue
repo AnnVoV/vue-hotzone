@@ -1,6 +1,13 @@
 <template>
     <div id="app">
-        <hotzone-drag imgUrl="//haitao.nos.netease.com/5ba23995-d600-4959-8dd3-2d6da4f84f53.png"></hotzone-drag>
+        <hotzone-drag
+            :container-width="960"
+            :container-height="480"
+            :is-multi="true"
+            imgUrl="//haitao.nosdn2.127.net/4PyHd5XCMRC5e0fWWFfLvA6a513T1805121745_960_480.jpg"
+            @selectup="getZone"
+            @addzone="addZone"
+        ></hotzone-drag>
     </div>
 </template>
 
@@ -11,6 +18,14 @@ export default {
     name: 'App',
     components: {
         HotzoneDrag
+    },
+    methods: {
+        getZone(data) {
+            console.log('获取最终热区信息：', data);
+        },
+        addZone(data) {
+            console.log('添加了新热区：', data);
+        }
     }
 }
 </script>

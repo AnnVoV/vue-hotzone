@@ -29,5 +29,21 @@ export default {
     numberArrInString (str) {
         var arr = str.match(/(\d)+/g)
         return arr
+    },
+    checkIsAddHotzone (target, selector) {
+        var resultList = [];
+        var selectArr = selector.split('|');
+        selectArr.forEach((val) => {
+            if (target.classList.contains(val)) {
+                resultList.push(1);
+            }
+        })
+        return (resultList.length === 0);
+    },
+    closest (target, selector) {
+        while (!target.classList.contains(selector)) {
+            target = target.parentNode
+        }
+        return target;
     }
 }

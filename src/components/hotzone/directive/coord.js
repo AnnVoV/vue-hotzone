@@ -22,6 +22,10 @@ export default {
             height: react.height
         }
     },
+    setDragCorner () {
+        this.dragDir = 'se';
+        this.opDragDir = 'nw';
+    },
     getDragCorner (target) {
         this.dragDir = target.dataset.drag || 'move'
         switch (this.dragDir) {
@@ -68,7 +72,7 @@ export default {
             height: Math.abs(point.y2 - point.y)
         }
     },
-    getDragCoord (moveTargetPos, mouseX, mouseY, containerPos) {
+    getDragCoord (moveTargetPos, mouseX, mouseY, containerPos, isAddZone) {
         const restrictX = restrictXInCon(containerPos)
         const restrictY = restrictYInCon(containerPos)
         switch (this.opDragDir) {

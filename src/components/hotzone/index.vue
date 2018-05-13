@@ -1,6 +1,24 @@
 <template>
-    <section class="hotzone" :style="{backgroundImage: `url( ${imgUrl})`}" v-touchdir @mouseup="upTest">
-        <div class="hotzone-area" :style="{width: `${anchorWidth}px`, height: `${anchorHeight}px`, transform: `translate(${initialLeft}px, ${initialTop}px)`}">
+    <section class="hotzone" :style="{backgroundImage: `url( ${imgUrl})`, width: `${containerWidth}px`, height: `${containerHeight}px`}" v-touchdir
+             @addhotzone="addZone"
+             @selectstart="selectStart"
+             @selectup="changeZone"
+    >
+        <div class="hotzone-area"
+             v-if="!isMulti"
+             :style="{width: `${anchorWidth}px`, height: `${anchorHeight}px`, transform: `translate(${initialLeft}px, ${initialTop}px)`}">
+            <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
+                 :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
+            ></div>
+        </div>
+        <div class="hotzone-area"
+             v-else
+             :style="{width: `${hotzone.anchorWidth}px`, height: `${hotzone.anchorHeight}px`, transform: `translate(${hotzone.initialLeft}px, ${hotzone.initialTop}px)`}"
+             :index="index"
+             :data-index="index"
+             v-for="(hotzone, index) in hotzoneList"
+        >
+            <span v-if="!isHideFlag" class="hotzone-area-flag">{{index}}</span>
             <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
                  :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
             ></div>
@@ -19,9 +37,11 @@ export default {
     },
     data () {
         return {
-            anchorWidth: 50,
-            anchorHeight: 50,
+            anchorWidth: 40,
+            anchorHeight: 40,
             anchorNormalKlass: 'hotzone-area-anchor',
+            hotzoneList: [
+            ],
             anchorKlassList: [
                 {klass: 'hotzone-area-leftTop', drag: 'nw'},
                 {klass: 'hotzone-area-top', drag: 'n'},
@@ -43,14 +63,39 @@ export default {
         initialTop: {
             type: Number,
             default: 100
+        },
+        containerWidth: {
+            type: Number,
+            default: 500
+        },
+        containerHeight: {
+            type: Number,
+            default: 400
+        },
+        isMulti: {
+            type: Boolean,
+            default: false
+        },
+        isHideFlag: {
+            type: Boolean,
+            default: false
         }
     },
     methods: {
-        test () {
-            console.log('test');
+        addZone(e) {
+            var data = e.detail || null;
+            if(!data) return;
+            this.hotzoneList.push(data)
+            this.$emit('addzone', data);
         },
-        upTest(e) {
-            console.log(e);
+        changeZone(e) {
+            var hotzoneList = this.hotzoneList;
+            var index = e.detail.index;
+            hotzoneList[index] = e.detail;
+            this.$emit('selectup', hotzoneList);
+        },
+        selectStart(e) {
+            this.$emit('selectstart', e.detail);
         }
     }
 }
@@ -59,10 +104,7 @@ export default {
 <style scoped>
     .hotzone {
         position: relative;
-        width: 500px;
-        height: 400px;
         border: 1px dashed #ddd;
-        background-position: 50%;
     }
 
     .hotzone-img {
@@ -71,8 +113,9 @@ export default {
     }
 
     .hotzone-area {
+        border: 1px dashed #333;
         position: absolute;
-        background: rgba(0, 0, 0, .6);
+        background: rgba(0, 0, 0, .2);
         z-index: 100;
     }
 
@@ -80,8 +123,22 @@ export default {
         position: absolute;
         width: 8px;
         height: 8px;
-        background: rgb(255, 255, 255);
+        background-color: #fff;
         border: 1px solid #000;
+        opacity: .5;
+    }
+    .hotzone-area-flag {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        line-height: 15px;
+        background: #000;
+        font-size: 10px;
+        text-align: center;
+        color: #fff;
     }
 
     .hotzone-area-leftTop {
