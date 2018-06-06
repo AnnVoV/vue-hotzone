@@ -23,8 +23,8 @@ export default {
         }
     },
     setDragCorner () {
-        this.dragDir = 'se';
-        this.opDragDir = 'nw';
+        this.dragDir = 'se'
+        this.opDragDir = 'nw'
     },
     getDragCorner (target) {
         this.dragDir = target.dataset.drag || 'move'

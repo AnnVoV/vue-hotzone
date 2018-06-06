@@ -1,6 +1,6 @@
 export default {
     moveZone (target) {
-        var isMove = target.matches('.hotzone-area')
+        var isMove = target.matches('.hotzone-area') || target.matches('.hotzone-area-link')
         return (setValue) => {
             if (typeof setValue !== 'undefined') isMove = setValue
             return isMove
@@ -30,20 +30,34 @@ export default {
         var arr = str.match(/(\d)+/g)
         return arr
     },
+    // 'hotzone-area|hotzone-area-anchor|hotzone-area-flag|hotzone-area-link|hotzone-area-button|hotzone-area-btntxt'
     checkIsAddHotzone (target, selector) {
-        var resultList = [];
-        var selectArr = selector.split('|');
+        // 我本质是要获取hotzone-area这一层
+        /* let node = this.farthestParent(target, document.querySelector('.hotzone'))
+        if(node && node.classList) {
+            return !node.classList.contains('hotzone-area') && (node !== document.body);
+        }
+        return true; */
+        var resultList = []
+        var selectArr = selector.split('|')
         selectArr.forEach((val) => {
             if (target.classList.contains(val)) {
-                resultList.push(1);
+                resultList.push(1)
             }
         })
-        return (resultList.length === 0);
+        return (resultList.length === 0)
     },
     closest (target, selector) {
         while (!target.classList.contains(selector)) {
             target = target.parentNode
         }
-        return target;
+        return target
+    },
+    farthestParent (target, parentNode) {
+        parentNode = parentNode || document.body
+        while (target.parentNode && target.parentNode !== parentNode) {
+            target = target.parentNode
+        }
+        return target
     }
 }

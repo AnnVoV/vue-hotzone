@@ -1,10 +1,10 @@
 <template>
     <div id="app">
         <hotzone-drag
-            :container-width="960"
-            :container-height="480"
-            :is-multi="true"
-            imgUrl="//haitao.nosdn2.127.net/4PyHd5XCMRC5e0fWWFfLvA6a513T1805121745_960_480.jpg"
+            imgUrl="//haitao.nos.netease.com/8587a660-7f81-4ab7-a25c-3372f0230440.png"
+                 :ratio="0.8"
+                 :isMulti="true"
+                 :ifNeedDialog="true"
             @selectup="getZone"
             @addzone="addZone"
         ></hotzone-drag>
@@ -13,6 +13,7 @@
 
 <script>
 import HotzoneDrag from './components/hotzone/index'
+import 'element-ui/lib/theme-chalk/index.css';
 
 export default {
     name: 'App',
