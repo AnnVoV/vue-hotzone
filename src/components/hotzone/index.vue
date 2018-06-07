@@ -27,8 +27,8 @@
                      :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
                 ></div>
                 <div class="hotzone-area-button">
-                    <div class="hotzone-area-btntxt" v-if="hotzone.link" @click="editLink(index)">编辑</div>
-                    <div class="hotzone-area-btntxt" @click="deleteZone(index)">删除</div>
+                    <div class="hotzone-area-btntxt" v-if="hotzone.link" @click="editLink(index, $event)">编辑</div>
+                    <div class="hotzone-area-btntxt" @click="deleteZone(index, $event)">删除</div>
                 </div>
             </div>
         </section>
@@ -52,7 +52,7 @@
 </template>
 
 <script>
-/**
+    /**
      * 使用例子：
      * 必填属性：
      * imgUrl: 图片url
@@ -71,182 +71,180 @@
      * selectup
      * todo: 双击操作处理
      */
-import touchdir from './directive/touchMoveDir.js'
-const STATUS = {
-    NORMAL: 0,
-    ADD: 1,
-    EDIT: 2,
-    DELETE: 3
-}
+    import touchdir from './directive/touchMoveDir.js'
+    const STATUS = {
+        NORMAL: 0,
+        ADD: 1,
+        EDIT: 2,
+        DELETE: 3
+    }
 
-export default {
-    name: 'HotzoneArea',
-    directives: {
-        touchdir
-    },
-    data () {
-        return {
-            status: STATUS.NORMAL,
-            rules: {
-                link: {required: true, message: '热区链接不能为空', trigger: 'blur'}
+    export default {
+        name: 'HotzoneArea',
+        directives: {
+            touchdir
+        },
+        data() {
+            return {
+                status: STATUS.NORMAL,
+                rules: {
+                    link: {required: true, message: '热区链接不能为空', trigger: 'blur'}
+                },
+                currIndex: 0,
+                isShowDialog: false,
+                form: {},
+                imgWidth: 0,
+                imgHeight: 0,
+                containerWidth: 0,
+                containerHeight: 0,
+                width: 40,
+                height: 40,
+                anchorNormalKlass: 'hotzone-area-anchor',
+                hotzoneList: [],
+                resultList: [],
+                anchorKlassList: [
+                    {klass: 'hotzone-area-leftTop', drag: 'nw'},
+                    {klass: 'hotzone-area-top', drag: 'n'},
+                    {klass: 'hotzone-area-rightTop', drag: 'ne'},
+                    {klass: 'hotzone-area-right', drag: 'e'},
+                    {klass: 'hotzone-area-rightBottom', drag: 'se'},
+                    {klass: 'hotzone-area-bottom', drag: 's'},
+                    {klass: 'hotzone-area-leftBottom', drag: 'sw'},
+                    {klass: 'hotzone-area-left', drag: 'w'}
+                ]
+            }
+        },
+        props: {
+            imgUrl: String,
+            ifNeedDialog: {
+                type: Boolean,
+                default: false
             },
-            currIndex: 0,
-            isShowDialog: false,
-            form: {},
-            imgWidth: 0,
-            imgHeight: 0,
-            containerWidth: 0,
-            containerHeight: 0,
-            width: 40,
-            height: 40,
-            anchorNormalKlass: 'hotzone-area-anchor',
-            hotzoneList: [],
-            resultList: [],
-            anchorKlassList: [
-                {klass: 'hotzone-area-leftTop', drag: 'nw'},
-                {klass: 'hotzone-area-top', drag: 'n'},
-                {klass: 'hotzone-area-rightTop', drag: 'ne'},
-                {klass: 'hotzone-area-right', drag: 'e'},
-                {klass: 'hotzone-area-rightBottom', drag: 'se'},
-                {klass: 'hotzone-area-bottom', drag: 's'},
-                {klass: 'hotzone-area-leftBottom', drag: 'sw'},
-                {klass: 'hotzone-area-left', drag: 'w'}
-            ]
-        }
-    },
-    props: {
-        imgUrl: String,
-        ifNeedDialog: {
-            type: Boolean,
-            default: false
-        },
-        initialLeft: {
-            type: Number,
-            default: 100
-        },
-        initialTop: {
-            type: Number,
-            default: 100
-        },
-        isMulti: {
-            type: Boolean,
-            default: false
-        },
-        isHideFlag: {
-            type: Boolean,
-            default: false
-        },
-        ratio: {
-            type: Number,
-            default: 1
-        },
-        showDialog: {
-            type: Boolean,
-            default: false
-        }
-    },
-    watch: {
-        hotzoneList: function () {
-            let length = this.hotzoneList.length
-            this.currIndex = (length > 0) ? (length - 1) : length
-        }
-    },
-    mounted () {
-        this.getImgWidthAndHeight(this.setContainerWidthAndHeight)
-    },
-    methods: {
-        getImgWidthAndHeight (cb) {
-            let img = new Image()
-            let url = this.imgUrl
-            img.src = url
-            img.onload = () => {
-                this.imgWidth = img.width
-                this.imgHeight = img.height
-                cb()
+            initialLeft: {
+                type: Number,
+                default: 100
+            },
+            initialTop: {
+                type: Number,
+                default: 100
+            },
+            isMulti: {
+                type: Boolean,
+                default: false
+            },
+            isHideFlag: {
+                type: Boolean,
+                default: false
+            },
+            ratio: {
+                type: Number,
+                default: 1
+            },
+            showDialog: {
+                type: Boolean,
+                default: false
             }
         },
-        setContainerWidthAndHeight () {
-            this.containerWidth = this.imgWidth * this.ratio
-            this.containerHeight = this.imgHeight * this.ratio
+        watch: {
+            hotzoneList: function () {
+                let length = this.hotzoneList.length
+                this.currIndex = (length > 0) ? (length - 1) : length
+            }
         },
-        addZone (e) {
-            let data = e.detail || null
-            if (!data) return
-            this.hotzoneList.push(data)
-            this.$emit('addzone', data)
+        mounted() {
+            this.getImgWidthAndHeight(this.setContainerWidthAndHeight)
         },
-        changeZone (e) {
-            debugger
-            let hotzoneList = this.hotzoneList
-            let index = e.detail.index
-            let oldData = hotzoneList[index] || {}
+        methods: {
+            getImgWidthAndHeight(cb) {
+                let img = new Image()
+                let url = this.imgUrl
+                img.src = url
+                img.onload = () => {
+                    this.imgWidth = img.width
+                    this.imgHeight = img.height
+                    cb()
+                }
+            },
+            setContainerWidthAndHeight() {
+                this.containerWidth = this.imgWidth * this.ratio
+                this.containerHeight = this.imgHeight * this.ratio
+            },
+            addZone(e) {
+                let data = e.detail || null
+                if (!data) return
+                this.hotzoneList.push(data)
+                this.$emit('addzone', data)
+            },
+            changeZone(e) {
+                let hotzoneList = this.hotzoneList
+                let index = e.detail.index
+                let oldData = hotzoneList[index] || {}
 
-            hotzoneList[index] = Object.assign({}, oldData, e.detail)
-            this.toShowDialog(index)
-            this.formatData(hotzoneList[index], index)
-            this.$emit('selectup', this.resultList)
-        },
-        selectStart (e) {
-            this.$emit('selectstart', e.detail)
-        },
-        formatData (data, index) {
-            let orgData = this.resultList[index] || {}
-            let cloneData = Object.assign({}, orgData, data)
-            for (let key in data) {
-                if (['index', 'link'].indexOf(key) === -1) {
-                    cloneData[key] = data[key] / this.ratio
+                hotzoneList[index] = Object.assign({}, oldData, e.detail)
+                this.toShowDialog(index)
+                this.formatData(hotzoneList[index], index)
+                this.$emit('selectup', this.resultList)
+            },
+            selectStart(e) {
+                this.$emit('selectstart', e.detail)
+            },
+            formatData(data, index) {
+                let orgData = this.resultList[index] || {}
+                let cloneData = Object.assign({}, orgData, data)
+                for (let key in data) {
+                    if (['index', 'link'].indexOf(key) === -1) {
+                        cloneData[key] = data[key] / this.ratio
+                    }
                 }
-            }
-            this.resultList[index] = cloneData
-        },
-        toShowDialog (index) {
-            var data = this.resultList[index] || {}
-            if (!data.link) {
-                this.isShowDialog = true
-            }
-        },
-        confirmLink (e) {
-            e.stopPropagation()
-            this.validateDiaForm()
-        },
-        validateDiaForm () {
-            // 验证弹窗上的表格
-            this.$refs.form.validate((valid) => {
-                if (valid) {
-                    this.isShowDialog = false
-                    this.setLinkData()
+                this.resultList[index] = cloneData
+            },
+            toShowDialog(index) {
+                var data = this.resultList[index] || {};
+                if(!data.link) {
+                    this.isShowDialog = true
                 }
-            })
-        },
-        setLinkData () {
-            // 弹窗内设置热区链接
-            let currIndex = this.currIndex
-            this.hotzoneList[currIndex].link = this.form.link
-            this.resultList[currIndex].link = this.form.link
-            this.form.link = ''
-        },
-        beforeClose () {
-            // 关闭弹窗前钩子
-            this.validateDiaForm()
-        },
-        editLink (index) {
-            // 编辑热区链接
-            let orgLink = this.hotzoneList[index].link
-            this.form.link = orgLink
-            this.isShowDialog = true
-            this.currIndex = index
-        },
-        deleteZone (index) {
-            // 删除热区
-            console.log('old:')
-            let temp = Object.assign({}, this.hotzoneList)
-            console.log(temp)
-            this.hotzoneList.splice(index, 1)
-            console.log('new')
-            console.log(this.hotzoneList)
+            },
+            confirmLink(e) {
+                e.stopPropagation()
+                this.validateDiaForm();
+            },
+            validateDiaForm() {
+                // 验证弹窗上的表格
+                this.$refs.form.validate((valid) => {
+                    if (valid) {
+                        this.isShowDialog = false
+                        this.setLinkData()
+                    }
+                });
+            },
+            setLinkData() {
+                // 弹窗内设置热区链接
+                let currIndex = this.currIndex;
+                this.hotzoneList[currIndex].link = this.form.link;
+                this.resultList[currIndex].link = this.form.link;
+                this.form.link = '';
+            },
+            beforeClose() {
+                // 关闭弹窗前钩子
+                this.validateDiaForm();
+            },
+            editLink(index, e) {
+                e.stopPropagation();
+                // 编辑热区链接
+                let orgLink = this.hotzoneList[index].link;
+                this.form.link = orgLink;
+                this.isShowDialog = true;
+                this.currIndex = index;
+            },
+            deleteZone(index, e) {
+                debugger;
+                e.stopPropagation();
+                // 删除热区
+                this.hotzoneList.splice(index, 1)
+                this.resultList.splice(index, 1)
+            }
         }
     }
-}
 </script>
 
 <style scoped>
@@ -352,9 +350,7 @@ export default {
         left: 50%;
         transform: translate(-50%, 0);
         text-align: center;
-    }
-
-    .hotzone-area-btntxt {
+    div {
         display: inline-block;
         padding: 2px 5px;
         line-height: 20px;
@@ -363,10 +359,11 @@ export default {
         border-radius: 4px;
         font-size: 12px;
         cursor:pointer;
-    }
-    .hotzone-area-btntxt:last-child {
+    &:last-child {
          background: #67739b;
      }
+    }
+    }
 
     .u-dialog-btn {
         text-align: center;

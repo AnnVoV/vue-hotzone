@@ -18,7 +18,7 @@ let currIndex = 0
 let allHotzone = 0
 
 let bindEvent = (el, ctx) => {
-    const MOVE = 1, DRAG = 2, ADD = 3;
+    const MOVE = 1, DRAG = 2, ADD = 3, UP = 4;
     let mouseStartTime;
     let containerPos = {}, moveTargetPos = {}, status;// status 分为3种状态一个是移动，一个是拖拽, 一个是增加热区
     let getIsAddZone = (function () {
@@ -47,6 +47,7 @@ let bindEvent = (el, ctx) => {
                 moveTargetPos.initialX = e.clientX - containerPos.x
                 moveTargetPos.initialY = e.clientY - containerPos.y
                 getIsAddZone(true)
+                status = ADD
                 Coord.setDragCorner()
                 /**
                  *注意：custom event 只能用detail
@@ -78,6 +79,7 @@ let bindEvent = (el, ctx) => {
                     y: detail.initialTop + containerPos.y
                 }
             } else {
+                status = MOVE
                 currIndex = Number(_.closest(target, 'hotzone-area').dataset.index) || 0
                 getIsDrag = _.dragAnchor(target)
                 getIsMove = _.moveZone(target)
@@ -90,6 +92,7 @@ let bindEvent = (el, ctx) => {
             }
         },
         mousemove (e) {
+            e.stopPropagation();
             if (typeof el.children === 'undefined' || el.children.length === 0) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let nowPos = {}, pos = {}
@@ -98,7 +101,7 @@ let bindEvent = (el, ctx) => {
             let point = Coord.getDragCoord(moveTargetPos, mouseX, mouseY, containerPos)
             let oldX = (point && point.x) || 0, oldY = (point && point.y) || 0
 
-            if(typeof elStyle === 'undefined') return;
+            if(typeof elStyle === 'undefined' || status === UP) return;
             if (getIsDrag() || getIsAddZone()) {
                 status = (getIsDrag()) ? DRAG : ADD;
                 nowPos = Coord.calculateByPoint(point)
@@ -109,6 +112,9 @@ let bindEvent = (el, ctx) => {
                 elStyle.height = `${nowPos.height}px`
                 if (point.isChange) elStyle.webkitTransform = elStyle.transform = `translate(${point.x}px, ${point.y}px)`
             } else if (getIsMove()) {
+                if(Math.abs(mouseX) > 15 || Math.abs(mouseY) > 15) {
+                    console.log('超出预定范围');
+                }
                 status = MOVE;
                 pos = _.restrictMove(mouseX, mouseY, moveTargetPos.width, moveTargetPos.height, containerPos)
                 elStyle.webkitTransform = elStyle.transform = `translate(${pos.x}px, ${pos.y}px)`
@@ -116,24 +122,26 @@ let bindEvent = (el, ctx) => {
         },
         mouseup (e) {
             let container = el.parentNode;
-            let target = e.target;
             let node = _.farthestParent(e.target, container);
+            let isBtn = e.target.matches('.hotzone-area-btntxt');
+            let isHotzone = node.matches && node.matches('.hotzone');
+            let isDocument = node === document;
+
             // todo 如果是弹窗或者编辑按钮的mouseup 直接return，如何优化
-            if(e.target.matches('.hotzone-area-btntxt') || !node.matches('.hotzone') && node !== document.body) return
-            if (typeof el.children === 'undefined' || el.children.length === 0) return
+            if(isBtn || !isHotzone && !isDocument) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
-            let elStyle = el.children[index] && el.children[index].style
+            let elStyle = el.children && el.children[index] && el.children[index].style || {};
             let posArr = [], res = {}, width, height
             // 手松开的时间
-            let deltaTime = +new Date() - mouseStartTime;
-            // todo 如果elStyle 未定义或者手指开始与结束之间区间<800 则忽略
-            if(typeof elStyle === 'undefined') return;
+            //let deltaTime = +new Date() - mouseStartTime;
+            // todo 如果elStyle 未定义或者手指开始与结束之间区间<500 则忽略
+            if(Object.keys(elStyle).length === 0) return;
             width = (_.numberArrInString(elStyle.width)[0]);
             height = (_.numberArrInString(elStyle.height)[0]);
             getIsAddZone(false)
             getIsMove(false)
             getIsDrag(false)
-            posArr = elStyle.transform.match(/(\d)+.?(\d)+/g)
+            posArr = elStyle.transform.match(/(\d)+.?(\d)*/g)
             res = {
                 width,
                 height,
@@ -148,13 +156,19 @@ let bindEvent = (el, ctx) => {
                 let event = new CustomEvent('selectup', {detail: res})
                 el.dispatchEvent(event)
             }
-            status = '';
+            status = UP;
         }
     }
 
     el.addEventListener('mousedown', handler.mousedown)
     el.addEventListener('mousemove', handler.mousemove)
+    // 为了能监听到hotzone 区域外的up, 所以我们需要监听整个document
     document.body.addEventListener('mouseup', handler.mouseup)
+    document.body.addEventListener('mousemove', () => {
+        if(status === ADD) {
+            handler.mouseup({target: document.body})
+        }
+    })
 }
 
 let offEvent = (el) => {
