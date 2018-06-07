@@ -141,7 +141,7 @@ let bindEvent = (el, ctx) => {
             getIsAddZone(false)
             getIsMove(false)
             getIsDrag(false)
-            posArr = elStyle.transform.match(/(\d)+.?(\d)*/g)
+            posArr = elStyle.transform.match(/\d+\.?(\d)*/g)
             res = {
                 width,
                 height,
