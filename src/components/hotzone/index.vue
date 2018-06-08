@@ -9,22 +9,24 @@
         >
             <div class="hotzone-area"
                  v-if="!isMulti"
-                 :style="{width: `${width}px`, height: `${height}px`, transform: `translate(${initialLeft}px, ${initialTop}px)`}">
-                <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
+                 :style="{width: `${width}px`, height: `${height}px`, transform: `translate(${x}px, ${y}px)`}">
+                <div v-for="(item, klassIndex) in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
+                     :key="klassIndex"
                      :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
                 ></div>
             </div>
             <div class="hotzone-area"
                  v-else
-                 :style="{width: `${hotzone.width}px`, height: `${hotzone.height}px`, transform: `translate(${hotzone.initialLeft}px, ${hotzone.initialTop}px)`}"
+                 :style="{width: `${hotzone.width}px`, height: `${hotzone.height}px`, transform: `translate(${hotzone.x}px, ${hotzone.y}px)`}"
                  :index="index"
                  :data-index="index"
+                 :key="index"
                  v-for="(hotzone, index) in hotzoneList"
             >
                 <span v-if="!isHideFlag" class="hotzone-area-flag">{{index}}</span>
                 <span class="hotzone-area-link" v-if="hotzone.link">{{hotzone.link}}</span>
-                <div v-for="item in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
-                     :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}"
+                <div v-for="(item, anchorKey) in anchorKlassList" :class="['hotzone-area-anchor', item.klass]"
+                     :data-drag="item.drag" :style="{cursor: `${item.drag}-resize`}" :key="anchorKey"
                 ></div>
                 <div class="hotzone-area-button">
                     <div class="hotzone-area-btntxt" v-if="hotzone.link" @click="editLink(index, $event)">编辑</div>
@@ -57,10 +59,11 @@
      * 必填属性：
      * imgUrl: 图片url
      * ratio: 图片相对于 容器的缩放比例，默认为1
+     * ifNeedDialog: 是否在画完热区时需要弹出弹窗， 默认为false
      * 选填属性：
-     * initialLeft: 初始热区组件相对容器的left，默认为100px
-     * initialTop: 初始热区组件相对容器的Top，默认为100px
-     * isMulti: 是否支持画多个热区 默认true
+     * x: 初始热区组件相对容器的left，默认为0px
+     * y: 初始热区组件相对容器的Top，默认为0px
+     * isMulti: 是否支持画多个热区 默认false
      * isHideFlag: 是否要隐藏序号标签，默认false不隐藏
      * isShowDialog: 默认false不显示弹窗
      * 例子：
@@ -115,17 +118,21 @@ export default {
     },
     props: {
         imgUrl: String,
+        defaultHotzoneList: {
+            type: Array,
+            default: []
+        },
         ifNeedDialog: {
             type: Boolean,
             default: true
         },
-        initialLeft: {
+        x: {
             type: Number,
-            default: 100
+            default: 0
         },
-        initialTop: {
+        y: {
             type: Number,
-            default: 100
+            default: 0
         },
         isMulti: {
             type: Boolean,
@@ -152,8 +159,17 @@ export default {
     },
     mounted () {
         this.getImgWidthAndHeight(this.setContainerWidthAndHeight)
+        this.initDefaultHotzoneData()
     },
     methods: {
+        initDefaultHotzoneData () {
+            let initialData = this.defaultHotzoneList
+            initialData.forEach((val, index) => {
+                initialData[index] = this.formatData(val, index, 'in')
+            })
+            console.log(initialData)
+            this.hotzoneList = initialData
+        },
         getImgWidthAndHeight (cb) {
             let img = new Image()
             let url = this.imgUrl
@@ -178,24 +194,25 @@ export default {
             let hotzoneList = this.hotzoneList
             let index = e.detail.index
             let oldData = hotzoneList[index] || {}
-
             hotzoneList[index] = Object.assign({}, oldData, e.detail)
             this.toShowDialog(index)
-            this.formatData(hotzoneList[index], index)
+            this.resultList[index] = this.formatData(hotzoneList[index], index)
+            console.log('result:', this.resultList)
             this.$emit('selectup', this.resultList)
         },
         selectStart (e) {
             this.$emit('selectstart', e.detail)
         },
-        formatData (data, index) {
+        formatData (data, index, type) {
+            type = type || 'out' // type 分为in 输入 out 输出两种类型
             let orgData = this.resultList[index] || {}
             let cloneData = Object.assign({}, orgData, data)
             for (let key in data) {
                 if (['index', 'link'].indexOf(key) === -1) {
-                    cloneData[key] = data[key] / this.ratio
+                    cloneData[key] = (type === 'out') ? (data[key] / this.ratio) : (data[key] * this.ratio)
                 }
             }
-            this.resultList[index] = cloneData
+            return cloneData
         },
         toShowDialog (index) {
             var data = this.resultList[index] || {}
@@ -227,17 +244,14 @@ export default {
             // 关闭弹窗前钩子
             this.validateDiaForm()
         },
-        editLink (index, e) {
-            e.stopPropagation()
+        editLink (index) {
             // 编辑热区链接
             let orgLink = this.hotzoneList[index].link
             this.form.link = orgLink
             this.isShowDialog = true
             this.currIndex = index
         },
-        deleteZone (index, e) {
-            debugger
-            e.stopPropagation()
+        deleteZone (index) {
             // 删除热区
             this.hotzoneList.splice(index, 1)
             this.resultList.splice(index, 1)
@@ -349,19 +363,19 @@ export default {
         left: 50%;
         transform: translate(-50%, 0);
         text-align: center;
-    div {
-        display: inline-block;
-        padding: 2px 5px;
-        line-height: 20px;
-        background: #e41436;
-        color: #fff;
-        border-radius: 4px;
-        font-size: 12px;
-        cursor:pointer;
-    &:last-child {
-         background: #67739b;
-     }
     }
+    .hotzone-area-button div {
+      display: inline-block;
+      padding: 2px 5px;
+      line-height: 20px;
+      background: #e41436;
+      color: #fff;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor:pointer;
+    }
+    .hotzone-area-button div:last-child {
+       background: #67739b;
     }
 
     .u-dialog-btn {

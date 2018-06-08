@@ -5,6 +5,7 @@
                  :ratio="0.8"
                  :isMulti="true"
                  :ifNeedDialog="true"
+                 :defaultHotzoneList="hotzoneList"
             @selectup="getZone"
             @addzone="addZone"
         ></hotzone-drag>
@@ -13,19 +14,24 @@
 
 <script>
 import HotzoneDrag from './components/hotzone/index'
-import 'element-ui/lib/theme-chalk/index.css';
+import 'element-ui/lib/theme-chalk/index.css'
 
 export default {
     name: 'App',
     components: {
         HotzoneDrag
     },
+    data () {
+        return {
+            hotzoneList: []
+        }
+    },
     methods: {
-        getZone(data) {
-            console.log('获取最终热区信息：', data);
+        getZone (data) {
+            console.log('获取最终热区信息：', data)
         },
-        addZone(data) {
-            console.log('添加了新热区：', data);
+        addZone (data) {
+            console.log('添加了新热区：', data)
         }
     }
 }

@@ -18,8 +18,10 @@ let currIndex = 0
 let allHotzone = 0
 
 let bindEvent = (el, ctx) => {
+    /* eslint-disable */
     const MOVE = 1, DRAG = 2, ADD = 3, UP = 4
     let containerPos = {}, moveTargetPos = {}, status// status 分为3种状态一个是移动，一个是拖拽, 一个是增加热区
+  /* eslint-enable */
     let getIsAddZone = (function () {
         let isAdd = false
         return (val) => {
@@ -54,8 +56,8 @@ let bindEvent = (el, ctx) => {
                  */
                 dragPos = {
                     detail: {
-                        initialLeft: moveTargetPos.initialX,
-                        initialTop: moveTargetPos.initialY,
+                        x: moveTargetPos.initialX,
+                        y: moveTargetPos.initialY,
                         width: 20,
                         height: 20
                     }
@@ -69,12 +71,12 @@ let bindEvent = (el, ctx) => {
                 target.dispatchEvent(event)
                 detail = dragPos.detail
                 moveTargetPos = {
-                    initialX: detail.initialLeft,
-                    initialY: detail.initialTop,
+                    initialX: detail.x,
+                    initialY: detail.y,
                     width: detail.width,
                     height: detail.height,
-                    x: detail.initialLeft + containerPos.x,
-                    y: detail.initialTop + containerPos.y
+                    x: detail.x + containerPos.x,
+                    y: detail.y + containerPos.y
                 }
             } else {
                 status = MOVE
@@ -91,7 +93,7 @@ let bindEvent = (el, ctx) => {
         },
         mousemove (e) {
             e.stopPropagation()
-            if (typeof el.children === 'undefined' || el.children.length === 0) return
+            if (status === UP || typeof el.children === 'undefined' || el.children.length === 0) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let nowPos = {}, pos = {}
             let elStyle = el.children[index] && el.children[index].style
@@ -127,7 +129,9 @@ let bindEvent = (el, ctx) => {
             if (isBtn || isDialog) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let elStyle = (el.children && el.children[index] && el.children[index].style) || {}
+            /* eslint-disable */
             let posArr = [], res = {}, width, height
+            /* eslint-enable */
 
             if (Object.keys(elStyle).length === 0) return
             width = (_.numberArrInString(elStyle.width)[0])
@@ -140,8 +144,6 @@ let bindEvent = (el, ctx) => {
             res = {
                 width,
                 height,
-                initialLeft: `${posArr[0]}`,
-                initialTop: `${posArr[1]}`,
                 x: `${posArr[0]}`,
                 y: `${posArr[1]}`,
                 index: index
