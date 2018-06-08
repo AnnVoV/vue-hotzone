@@ -120,7 +120,9 @@ export default {
         imgUrl: String,
         defaultHotzoneList: {
             type: Array,
-            default: []
+            default: function () {
+                return []
+            }
         },
         ifNeedDialog: {
             type: Boolean,
@@ -203,8 +205,14 @@ export default {
         selectStart (e) {
             this.$emit('selectstart', e.detail)
         },
+        /**
+         * @param data hotzoneList数组
+         * @param index 索引
+         * @param type 分为in 输入 out 输出两种类型， out 为/ration; in 为*ratio
+         * @returns {*}
+         */
         formatData (data, index, type) {
-            type = type || 'out' // type 分为in 输入 out 输出两种类型
+            type = type || 'out'
             let orgData = this.resultList[index] || {}
             let cloneData = Object.assign({}, orgData, data)
             for (let key in data) {

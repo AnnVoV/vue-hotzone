@@ -1,3 +1,7 @@
+/**
+ * @file touchMoveDir.js ~ 2018/06/08 17:13:52
+ * @author AnnVoV
+ **/
 import Coord from './coord.js'
 import _ from './util.js'
 
@@ -21,7 +25,7 @@ let bindEvent = (el, ctx) => {
     /* eslint-disable */
     const MOVE = 1, DRAG = 2, ADD = 3, UP = 4
     let containerPos = {}, moveTargetPos = {}, status// status 分为3种状态一个是移动，一个是拖拽, 一个是增加热区
-  /* eslint-enable */
+    /* eslint-enable */
     let getIsAddZone = (function () {
         let isAdd = false
         return (val) => {
@@ -36,8 +40,10 @@ let bindEvent = (el, ctx) => {
         return false
     }
     handler = {
-        mousedown (e) {
+        mousedown: function (e) {
+            /* eslint-disable */
             let dragPos = {}, event, detail
+            /* eslint-enable */
             let target = e.target
             containerPos = Coord.getPos(el)
             /**
@@ -93,6 +99,7 @@ let bindEvent = (el, ctx) => {
         },
         mousemove (e) {
             e.stopPropagation()
+            /* eslint-disable */
             if (status === UP || typeof el.children === 'undefined' || el.children.length === 0) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let nowPos = {}, pos = {}
@@ -100,6 +107,7 @@ let bindEvent = (el, ctx) => {
             let mouseX = e.clientX - containerPos.x, mouseY = e.clientY - containerPos.y
             let point = Coord.getDragCoord(moveTargetPos, mouseX, mouseY, containerPos)
             let oldX = (point && point.x) || 0, oldY = (point && point.y) || 0
+            /* eslint-enable */
 
             if (typeof elStyle === 'undefined' || status === UP) return
             if (getIsDrag() || getIsAddZone()) {

@@ -2,10 +2,9 @@
     <div id="app">
         <hotzone-drag
             imgUrl="//haitao.nos.netease.com/8587a660-7f81-4ab7-a25c-3372f0230440.png"
-                 :ratio="0.8"
-                 :isMulti="true"
-                 :ifNeedDialog="true"
-                 :defaultHotzoneList="hotzoneList"
+           :ratio="0.8"
+           :isMulti="true"
+           :ifNeedDialog="true"
             @selectup="getZone"
             @addzone="addZone"
         ></hotzone-drag>
