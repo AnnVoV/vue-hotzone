@@ -8,27 +8,34 @@
 - [x] 事件回调钩子还未增加
 - [ ] 参照https://github.com/pespantelis/vue-crop 优化我的指令
 - [x] 支持添加多个热区
+- [x] 支持热区链接添加
+- [x] 支持热区链接编辑
+- [x] 支持热区删除
 
 ## 示例图
 ![](https://haitao.nos.netease.com/37319ba8-75d3-46c8-8533-95114c6a1cf6.gif)
 
 ## Usage
 ```
-<hotzone-drag
-            :container-width="960"
-            :container-height="480"
-            :is-multi="true"
-            imgUrl="//haitao.nosdn2.127.net/4PyHd5XCMRC5e0fWWFfLvA6a513T1805121745_960_480.jpg"
-            @selectup="getZone"
-            @addzone="addZone"
-></hotzone-drag>
+<hotzone imgUrl="//haitao.nos.netease.com/8587a660-7f81-4ab7-a25c-3372f0230440.png"
+         :ratio="0.8"
+         :isMulti="true"
+         :ifNeedDialog="true"
+         @selectup="selectUp"
+></hotzone>
 ```
 
 ## Attributes
 组件属性:
-* container-width 容器宽度
-* container-height 容器高度
-* is-multi 是否要画多热区间
+* imgUrl 热区图片url
+* ratio 真实图片与需要的热区的缩放比例（默认为1）
+* isMulti 是否支持多个热区（默认false）
+* ifNeedDialog 是否在画完热区时要弹出弹框编辑链接（默认为true）
+* initialLeft: 初始热区组件相对容器的left，默认为100px
+* initialTop: 初始热区组件相对容器的Top，默认为100px
+* isMulti: 是否支持画多个热区 默认true
+* isHideFlag: 是否要隐藏序号标签，默认false不隐藏
+* isShowDialog: 默认false不显示弹窗
 
 组件钩子
 * addzone 画多个热区时，添加一个新的热区时触发
