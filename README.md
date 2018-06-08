@@ -10,7 +10,7 @@
 - [x] 支持添加多个热区
 
 ## 示例图
-![](https://haitao.nos.netease.com/0b570426-8d52-4380-94ff-26866f99b735.gif)
+![](https://haitao.nos.netease.com/37319ba8-75d3-46c8-8533-95114c6a1cf6.gif)
 
 ## Usage
 ```
