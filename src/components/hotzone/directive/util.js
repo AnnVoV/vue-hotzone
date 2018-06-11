@@ -1,6 +1,5 @@
 export default {
     moveZone (target) {
-        // let isMove = target.matches('.hotzone-area') || target.matches('.hotzone-area-link')
         let node = this.farthestParent(target, document.querySelector('.hotzone'))
         let isMove = node && node.classList.contains('hotzone-area') || false;
         return (setValue) => {

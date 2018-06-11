@@ -30,7 +30,7 @@ let bindEvent = (el, ctx) => {
         return false
     }
     handler = {
-        mousedown: function (e) {
+        mousedow (e) {
             /* eslint-disable */
             let dragPos = {}, event, detail
             /* eslint-enable */
@@ -48,14 +48,7 @@ let bindEvent = (el, ctx) => {
                 moveTargetPos.initialY = e.clientY - containerPos.y
                 getIsAddZone(true)
                 status = ADD
-                Coord.setDragCorner()
-                /**
-                 * 注意：custom event 只能用detail
-                 * 之前以为：ctx.$emit('selectstart', {event: e, outVal: 1}) 这样写参数带不过去，但其实是错的，我搞做了vnode.context的指向
-                 * vnode.context指向的是component的context 不是指向绑定在的那个vdom的ctx
-                 * 如果要具体的谁去接受，可以考虑dispatch的方式
-                 * 参考：https://github.com/vuejs/vue/issues/7147
-                 */
+                Coord.setDragCorner() // 设置拖拽的方向和对角方向（默认拖拽方向为：se）
                 dragPos = {
                     detail: {
                         x: moveTargetPos.initialX,
@@ -66,7 +59,12 @@ let bindEvent = (el, ctx) => {
                 }
                 /**
                  * emit selectstart 事件用于添加新热区
-                 * @type {CustomEvent<any>}
+                 * @type {CustomEvent<any>} CustomEvent抛出的参数必须是{detail:xxx} 结构
+                 * 注意：custom event 只能用detail
+                 * 之前以为：ctx.$emit('selectstart', {event: e, outVal: 1}) 这样写参数带不过去，但其实是错的，我搞做了vnode.context的指向
+                 * vnode.context指向的是component的context 不是指向绑定在的那个vdom的ctx
+                 * 如果要具体的谁去接受，可以考虑dispatch的方式
+                 * 参考：https://github.com/vuejs/vue/issues/7147
                  */
                 allHotzone++
                 event = new CustomEvent('addhotzone', dragPos)
@@ -90,8 +88,7 @@ let bindEvent = (el, ctx) => {
                 moveTargetPos = Coord.getPos(el.children[currIndex])
                 moveTargetPos.initialX = moveTargetPos.x - containerPos.x
                 moveTargetPos.initialY = moveTargetPos.y - containerPos.y
-                // vnode.context （rendered in this component's scope）注意ctx指向
-                ctx.$emit('selectstart', {position: moveTargetPos})
+                ctx.$emit('selectstart', {position: moveTargetPos}) // vnode.context （rendered in this component's scope）注意ctx指向
             }
         },
         mousemove (e) {
