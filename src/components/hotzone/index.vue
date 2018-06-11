@@ -1,10 +1,9 @@
 <template>
-    <div class="hotzone-container" @selectup="changeTest">
+    <div class="hotzone-container">
         <section class="hotzone"
                  :style="{backgroundImage: `url( ${imgUrl})`, width: `${containerWidth}px`, height: `${containerHeight}px`, backgroundSize: 'cover'}"
                  v-touchdir="hotzoneList"
                  @addhotzone="addZone"
-                 @selectstart="selectStart"
                  @selectup="changeZone"
         >
             <div class="hotzone-area"
@@ -197,12 +196,10 @@ export default {
             let index = e.detail.index
             let oldData = hotzoneList[index] || {}
             hotzoneList[index] = Object.assign({}, oldData, e.detail)
+            debugger;
             this.toShowDialog(index)
             this.resultList[index] = this.formatData(hotzoneList[index], index)
             this.$emit('selectup', this.resultList)
-        },
-        selectStart (e) {
-            this.$emit('selectstart', e.detail)
         },
         /**
          * @param data hotzoneList数组
@@ -222,7 +219,7 @@ export default {
             return cloneData
         },
         toShowDialog (index) {
-            var data = this.resultList[index] || {}
+            const data = this.resultList[index] || {}
             if (!data.link) {
                 this.isShowDialog = true
             }
@@ -262,9 +259,6 @@ export default {
             // 删除热区
             this.hotzoneList.splice(index, 1)
             this.resultList.splice(index, 1)
-        },
-        changeTest(e) {
-            console.log(e)
         }
     }
 }
@@ -368,7 +362,7 @@ export default {
     .hotzone-area-button {
         position: absolute;
         bottom: 0;
-        width: 140px;
+        width: 90px;
         padding: 10px 0;
         left: 50%;
         transform: translate(-50%, 0);

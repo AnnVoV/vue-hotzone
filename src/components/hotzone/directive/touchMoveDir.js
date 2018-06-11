@@ -12,8 +12,9 @@ let mouseStartTime
 
 let bindEvent = (el, ctx) => {
     /* eslint-disable */
+    // status 分为3种状态一个是移动，一个是拖拽, 一个是增加热区
     const MOVE = 1, DRAG = 2, ADD = 3, UP = 4
-    let containerPos = {}, moveTargetPos = {}, status// status 分为3种状态一个是移动，一个是拖拽, 一个是增加热区
+    let containerPos = {}, moveTargetPos = {}, status
     /* eslint-enable */
     let getIsAddZone = (function () {
         let isAdd = false
@@ -34,21 +35,26 @@ let bindEvent = (el, ctx) => {
             let dragPos = {}, event, detail
             /* eslint-enable */
             let target = e.target
+            const hotzoneContainer = document.querySelector('.hotzone')
             containerPos = Coord.getPos(el)
             mouseStartTime = new Date().getTime()
             /**
              * 添加新的热区或者移动已有热区
              */
-            if (_.checkIsAddHotzone(target)) {
+            // 重点重构方法： _.targetIsInContainer(target, container)
+            if (!_.targetIsInContainer(target, hotzoneContainer)) {
+                // 添加热区
                 moveTargetPos.initialX = e.clientX - containerPos.x
                 moveTargetPos.initialY = e.clientY - containerPos.y
                 getIsAddZone(true)
                 status = ADD
                 Coord.setDragCorner()
                 /**
-                 *注意：custom event 只能用detail
-                 *ctx.$emit('selectstart', {event: e, outVal: 1}) 这样写参数带不过去，不知道为啥
-                 *参考：https://github.com/vuejs/vue/issues/7147
+                 * 注意：custom event 只能用detail
+                 * 之前以为：ctx.$emit('selectstart', {event: e, outVal: 1}) 这样写参数带不过去，但其实是错的，我搞做了vnode.context的指向
+                 * vnode.context指向的是component的context 不是指向绑定在的那个vdom的ctx
+                 * 如果要具体的谁去接受，可以考虑dispatch的方式
+                 * 参考：https://github.com/vuejs/vue/issues/7147
                  */
                 dragPos = {
                     detail: {
@@ -75,6 +81,7 @@ let bindEvent = (el, ctx) => {
                     y: detail.y + containerPos.y
                 }
             } else {
+                // 移动热区或者拖拽热区
                 status = MOVE
                 currIndex = Number(_.closest(target, 'hotzone-area').dataset.index) || 0
                 getIsDrag = _.dragAnchor(target)
@@ -83,8 +90,8 @@ let bindEvent = (el, ctx) => {
                 moveTargetPos = Coord.getPos(el.children[currIndex])
                 moveTargetPos.initialX = moveTargetPos.x - containerPos.x
                 moveTargetPos.initialY = moveTargetPos.y - containerPos.y
-                event = new CustomEvent('selectstart', {detail: moveTargetPos})
-                target.dispatchEvent(event)
+                // vnode.context （rendered in this component's scope）注意ctx指向
+                ctx.$emit('selectstart', {position: moveTargetPos})
             }
         },
         mousemove (e) {
@@ -117,10 +124,12 @@ let bindEvent = (el, ctx) => {
         },
         mouseup (e) {
             const DELTA = new Date().getTime() - mouseStartTime
-            const TAP = (status === ADD) && (DELTA < 300);
-
-            // todo 如果是弹窗或者编辑按钮的mouseup 直接return，如何优化
-            if (status === UP || TAP) return
+            const TAP = DELTA <= 300
+            let event
+            if (status === UP || TAP) {
+                status = UP
+                return
+            }
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let elStyle = (el.children && el.children[index] && el.children[index].style) || {}
             /* eslint-disable */
@@ -142,7 +151,7 @@ let bindEvent = (el, ctx) => {
                 y: `${posArr[1]}`,
                 index: index
             }
-            let event = new CustomEvent('selectup', {detail: res})
+            event = new CustomEvent('selectup', {detail: res})
             el.dispatchEvent(event)
             status = UP
         },

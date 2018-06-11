@@ -32,23 +32,19 @@ export default {
         let arr = str.match(/(\d)+/g)
         return arr
     },
-    // 'hotzone-area|hotzone-area-anchor|hotzone-area-flag|hotzone-area-link|hotzone-area-button|hotzone-area-btntxt'
-    checkIsAddHotzone (target, selector) {
-        // 我本质是要获取看移动的元素是否为 hotzone-area这一层
-        // 在document.querySelector('.hotzone')下target的最远父元素
-        selector = selector || '.hotzone'
-        let node = this.farthestParent(target, document.querySelector('.hotzone'))
-        return node === document
-        /* let resultList = []
-        let selectArr = selector.split('|')
-        console.log('node:');
-        console.log(node);
-        selectArr.forEach((val) => {
-            if (target.classList.contains(val)) {
-                resultList.push(1)
-            }
-        })
-        return (resultList.length === 0) */
+    /**
+     * target 是否在container 元素内
+     * @param target
+     * @param selector
+     * @returns {boolean}
+     */
+    targetIsInContainer (target, container) {
+        const isContainer = target === container
+        const isSonNode = container.contains(target)
+        return !isContainer && isSonNode
+        // 我原来是这么判断的
+        // let node = this.farthestParent(target, document.querySelector('.hotzone'))
+        // return node === document
     },
     closest (target, selector) {
         while (target.classList && !target.classList.contains(selector)) {
@@ -64,5 +60,10 @@ export default {
             target = target.parentNode
         }
         return target
+    },
+    isClickOutside (target, el) {
+        // 这个非常有用
+        if (el.contains(target)) return false
+        return true
     }
 }

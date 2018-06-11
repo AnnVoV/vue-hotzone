@@ -7,6 +7,7 @@
            :ifNeedDialog="true"
             @selectup="getZone"
             @addzone="addZone"
+            @selectstart="addZoneStart"
         ></hotzone-drag>
     </div>
 </template>
@@ -27,10 +28,13 @@ export default {
     },
     methods: {
         getZone (data) {
-            console.log('获取最终热区信息：', data)
+            console.log('获取最终热区信息', data)
         },
         addZone (data) {
-            console.log('添加了新热区：', data)
+            console.log('添加了新热区', data)
+        },
+        addZoneStart () {
+            console.log('初始化添加热区')
         }
     }
 }
