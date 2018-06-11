@@ -5,21 +5,10 @@
 import Coord from './coord.js'
 import _ from './util.js'
 
-/**
- * 绑定的handler
- * @type {{}}
- */
 let handler = {}
-/**
- * 当前指向的是哪一个hotzone, 默认为0
- * @type {number}
- */
 let currIndex = 0
-/**
- * 全部的热区个数
- * @type {number}
- */
 let allHotzone = 0
+let mouseStartTime
 
 let bindEvent = (el, ctx) => {
     /* eslint-disable */
@@ -46,10 +35,11 @@ let bindEvent = (el, ctx) => {
             /* eslint-enable */
             let target = e.target
             containerPos = Coord.getPos(el)
+            mouseStartTime = new Date().getTime()
             /**
              * 添加新的热区或者移动已有热区
              */
-            if (_.checkIsAddHotzone(target, 'hotzone-area|hotzone-area-anchor|hotzone-area-flag|hotzone-area-link|hotzone-area-button|hotzone-area-btntxt')) {
+            if (_.checkIsAddHotzone(target)) {
                 moveTargetPos.initialX = e.clientX - containerPos.x
                 moveTargetPos.initialY = e.clientY - containerPos.y
                 getIsAddZone(true)
@@ -126,15 +116,11 @@ let bindEvent = (el, ctx) => {
             }
         },
         mouseup (e) {
-            let container = el.parentNode
-            let node = _.farthestParent(e.target, container)
-            let isBtn = e.target.matches('.hotzone-area-btntxt')
-            let isHotzone = node.matches && node.matches('.hotzone')
-            let isDocument = node === document
-            let isDialog = !isHotzone && !isDocument
+            const DELTA = new Date().getTime() - mouseStartTime
+            const TAP = (status === ADD) && (DELTA < 300);
 
             // todo 如果是弹窗或者编辑按钮的mouseup 直接return，如何优化
-            if (isBtn || isDialog) return
+            if (status === UP || TAP) return
             let index = (getIsAddZone()) ? allHotzone - 1 : currIndex
             let elStyle = (el.children && el.children[index] && el.children[index].style) || {}
             /* eslint-disable */
@@ -156,7 +142,6 @@ let bindEvent = (el, ctx) => {
                 y: `${posArr[1]}`,
                 index: index
             }
-
             let event = new CustomEvent('selectup', {detail: res})
             el.dispatchEvent(event)
             status = UP

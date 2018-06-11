@@ -1,5 +1,8 @@
-// https://eslint.org/docs/user-guide/configuring
-
+/**
+ * @file eslint ~ 2018/06/08 17:13:52
+ * @author AnnVoV
+ * https://eslint.org/docs/user-guide/configuring
+ **/
 module.exports = {
     root: true,
     parserOptions: {
